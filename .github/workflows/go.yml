@@ -9,7 +9,7 @@ on:
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: reah-ci-stateless
     steps:
     - uses: actions/checkout@v2
 
@@ -17,6 +17,17 @@ jobs:
       uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # v4.1.0
       with:
         go-version: '1.24.2'
+
+    - name: Ensure native build tools are available
+      shell: bash
+      run: |
+        set -euo pipefail
+        if command -v make >/dev/null 2>&1 && command -v gcc >/dev/null 2>&1; then
+          exit 0
+        fi
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends build-essential
+        sudo rm -rf /var/lib/apt/lists/*
 
     - name: Get
       run: go get -v
